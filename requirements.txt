@@ -4,7 +4,7 @@
 
 # ===== CORE TTS & AI =====
 # CoquiTTS with GPU acceleration
-TTS==0.22.0                    # CoquiTTS main library - character voice assignment
+TTS>=0.22.0                    # CoquiTTS main library - character voice assignment
 
 # PyTorch ecosystem (compatible with TTS and newer features)
 torch>=2.0.0,<3.0.0          # PyTorch with CUDA support

@@ -7,6 +7,7 @@ def test_gpu_setup():
     """Test GPU acceleration and model performance."""
     
     # Check GPU
+    print("Checking GPU...")
     print(f"CUDA Available: {torch.cuda.is_available()}")
     if torch.cuda.is_available():
         print(f"GPU: {torch.cuda.get_device_name(0)}")
