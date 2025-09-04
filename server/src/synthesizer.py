@@ -10,7 +10,8 @@ from TTS.api import TTS
 import os
 from pathlib import Path
 from typing import Dict, Optional
-import logging
+from .utils import setup_logging, get_logger, log_tts_operation
+import time
 
 # You'll import this from utils.py once you create logging setup
 # from .utils import setup_logging
@@ -27,6 +28,9 @@ class AdaptiveSynthesizer:
     
     def __init__(self, development_mode: bool = True):
         self.development_mode = development_mode
+        self.logger = get_logger(__name__)
+        self.logger.info(f"Initializing synthesizer in {'development' if development_mode else 'production'} mode")
+        
         
         if development_mode:
             # Fast model for development
@@ -59,15 +63,20 @@ class AdaptiveSynthesizer:
         Returns:
             str: Path to generated audio file
         """
+        start_time = time.time()
         voice_id = self.voice_mapping.get(voice_type, "default")
         
-        # Generate filename
-        output_path = f"audio_output/{voice_type}_{hash(text)}.wav"
+        # Generate filename using configurable path for audio output
+        self.audio_output_dir = Path("server/audio_output")
+        output_path = self.audio_output_dir / f"{voice_type}_{hash(text)}.wav"
         
         if self.development_mode:
             self.tts.tts_to_file(text=text, file_path=output_path)
         else:
             self.tts.tts_to_file(text=text, speaker=voice_id, file_path=output_path)
+            
+        duration = time.time() - start_time
+        log_tts_operation("voice_synthesis", duration, voice_type=voice_type, text_length=len(text))
         
         return output_path
     
