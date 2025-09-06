@@ -56,6 +56,7 @@ class TextSegment:
     segment_type: str  # 'dialogue', 'narrative', 'action'
     speaker: Optional[str] = None
     confidence: float = 1.0  # How sure are we about this classification?
+    voice_type: Optional[str] = None
 
 class TextParser:
     """Parses story text into dialogue and narrative segments."""

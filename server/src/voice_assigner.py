@@ -1,6 +1,8 @@
-from dataclasses import dataclass
-from typing import Optional, Dict, List
+from dataclasses import dataclass, field
+from typing import Optional, Dict, List, Any
 from enum import Enum
+import re
+from .parser import TextSegment
 
 class Gender(Enum):
     MALE = "male"
@@ -60,3 +62,74 @@ class VoiceProfile:
                 raise ValueError("assigned_to cannot be empty string")
             if len(self.assigned_to) > 50:  
                 raise ValueError(f"Character name too long: {len(self.assigned_to)}")        
+            
+            
+@dataclass 
+class VoiceSegment:
+    """A text segment with assigned voice information."""
+    text_segment: TextSegment  # Original parser output
+    voice_profile: VoiceProfile  # Assigned voice
+    
+    def get_synthesizer_params(self) -> Dict[str, str]:
+        """Get the minimal parameters needed for synthesis."""
+        return {
+            "text": self.text_segment.content,
+            "voice_type": self.voice_profile.voice_id  # Map voice_id to voice_type
+        }
+    
+    
+    def get_Voice_info(self) -> Dict[str, Any]:
+        """Get parameters for the synthesizer."""
+        return {
+            "text": self.text_segment.content,
+            "voice_id": self.voice_profile.voice_id,
+            "voice_name": self.voice_profile.name,
+            "speaker": self.voice_profile.assigned_to,
+            "confidence": self.text_segment.confidence,
+            "segment_type": self.text_segment.segment_type,
+            "voice_characteristics": self.voice_profile.characteristics
+        }
+    
+    def get_voice_id(self) -> str:
+        """Get the voice ID for the synthesizer."""
+        return self.voice_profile.voice_id
+    
+    def get_voice_name(self) -> str:
+        """Get the voice name for the synthesizer."""
+        return self.voice_profile.name
+    
+    def get_type(self) -> str:
+        """Get the type of the segment."""
+        return self.text_segment.segment_type
+    
+    def is_dialogue(self) -> bool:
+        """Check if this is a dialogue segment."""
+        return self.text_segment.segment_type == "dialogue"
+
+    def is_narrative(self) -> bool:
+        """Check if this is a narrative segment."""
+        return self.text_segment.segment_type == "narrative"
+
+    def get_speaker(self) -> Optional[str]:
+        """Get the speaker name if this is dialogue."""
+        return self.text_segment.speaker
+    
+class VoiceAssigner:
+    def __init__(self, voice_pool: List[VoiceProfile], persistence_file: str = "voice_assignments.json"):
+        # Initialize with available voices and persistence
+        #get voices
+    
+    def assign_voices(self, text_segments: List[TextSegment]) -> List[VoiceSegment]:
+        # Main method: convert TextSegments to VoiceSegments
+    
+    def _assign_character_voice(self, character_name: str) -> VoiceProfile:
+        # Assign voice to a character (with consistency)
+    
+    def _get_narrator_voice(self) -> VoiceProfile:
+        # Get voice for narrative segments
+    
+    def save_assignments(self) -> None:
+        # Persist current assignments
+    
+    def load_assignments(self) -> None:
+        # Load previous assignments
