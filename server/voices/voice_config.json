@@ -1,0 +1,40 @@
+{
+    "development_mode": {
+      "voices": [
+        {
+          "voice_id": "default",
+          "name": "Default Voice",
+          "characteristics": {
+            "gender": "neutral",
+            "age": "adult",
+            "accent": "neutral"
+          },
+          "role": "narrator"
+        }
+      ]
+    },
+    "production_mode": {
+      "voices": [
+        {
+          "voice_id": "p225",
+          "name": "Narrator Voice",
+          "characteristics": {
+            "gender": "male",
+            "age": "adult",
+            "accent": "american"
+          },
+          "role": "narrator"
+        },
+        {
+          "voice_id": "p226",
+          "name": "Female Character Voice",
+          "characteristics": {
+            "gender": "female",
+            "age": "young",
+            "accent": "american"
+          },
+          "role": "character"
+        }
+      ]
+    }
+  }

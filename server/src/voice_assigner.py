@@ -3,6 +3,8 @@ from typing import Optional, Dict, List, Any
 from enum import Enum
 import re
 from .parser import TextSegment
+import json
+import os
 
 class Gender(Enum):
     MALE = "male"
@@ -115,21 +117,51 @@ class VoiceSegment:
         return self.text_segment.speaker
     
 class VoiceAssigner:
-    def __init__(self, voice_pool: List[VoiceProfile], persistence_file: str = "voice_assignments.json"):
-        # Initialize with available voices and persistence
-        #get voices
+    def __init__(self, config_file: str = "server/voices/voice_config.json", 
+                 development_mode: bool = True):
+        self.development_mode = development_mode
+        self.voice_pool = self._load_voice_pool(config_file)
+        self.character_assignments = {}  # character_name -> voice_id
+        self.persistence_file = "server/voices/voice_assignments.json"
+        self._load_assignments()
+    
+    def _load_voice_pool(self, config_file: str) -> List[VoiceProfile]:
+        with open(config_file, "r") as f:
+            return [VoiceProfile(**voice) for voice in json.load(f)["voices"]]
+    
+    def _load_assignments(self) -> None:
+        if os.path.exists(self.persistence_file):
+            with open(self.persistence_file, "r") as f:
+                self.character_assignments = json.load(f)
     
     def assign_voices(self, text_segments: List[TextSegment]) -> List[VoiceSegment]:
         # Main method: convert TextSegments to VoiceSegments
+        voice_segments = []
+        for segment in text_segments:
+            voice_profile = self._assign_character_voice(segment.speaker)
+            voice_segments.append(VoiceSegment(segment, voice_profile))
+        return voice_segments
     
     def _assign_character_voice(self, character_name: str) -> VoiceProfile:
         # Assign voice to a character (with consistency)
+        if character_name in self.character_assignments:
+            return self.voice_pool[self.character_assignments[character_name]]
+        else:
+            return self._get_narrator_voice()
     
     def _get_narrator_voice(self) -> VoiceProfile:
         # Get voice for narrative segments
+        for voice in self.voice_pool:
+            if voice.role == "narrator":
+                return voice
+        return self.voice_pool[0]
     
     def save_assignments(self) -> None:
         # Persist current assignments
+        with open(self.persistence_file, "w") as f:
+            json.dump(self.character_assignments, f)
     
     def load_assignments(self) -> None:
         # Load previous assignments
+        with open(self.persistence_file, "r") as f:
+            self.character_assignments = json.load(f)
