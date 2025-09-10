@@ -1,4 +1,4 @@
-# AI Audiobook Generator (Prototype)
+# AI Audiobook Generator (Prototype) - not complete
 
 This is a lightweight prototype for generating AI-narrated audiobooks from plain text files. The goal is to assist users who prefer listening over reading by transforming books they own into audio using multiple synthetic voices — one for each character and a narrator.
 
