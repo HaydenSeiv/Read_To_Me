@@ -124,6 +124,15 @@ class VoiceAssigner:
         self.character_assignments = {}  # character_name -> voice_id
         self.persistence_file = "server/voices/voice_assignments.json"
         self._load_assignments()
+        
+    def __post_init__(self):
+        """Validate voice assignment logic."""
+        if self.is_dialogue() and not self.voice_profile.assigned_to:
+            raise ValueError("Dialogue should have a character assigned")
+        
+        self._load_assignments()
+            
+
     
     def _load_voice_pool(self, config_file: str) -> List[VoiceProfile]:
         with open(config_file, "r") as f:
