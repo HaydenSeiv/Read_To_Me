@@ -5,6 +5,7 @@ import re
 from .parser import TextSegment
 import json
 import os
+from pathlib import Path
 
 class Gender(Enum):
     MALE = "male"
@@ -38,6 +39,7 @@ class VoiceProfile:
     characteristics: VoiceCharacteristics
     is_available: bool = True
     assigned_to: Optional[str] = None
+    role: str = "narrator"
     
     def __post_init__(self):
     
@@ -117,8 +119,18 @@ class VoiceSegment:
         return self.text_segment.speaker
     
 class VoiceAssigner:
-    def __init__(self, config_file: str = "server/voices/voice_config.json", 
-                 development_mode: bool = True):
+    def __init__(self, config_file: str = None, development_mode: bool = True):
+        # Get the project root directory (where this file is located)
+        project_root = Path(__file__).parent.parent.parent  # Go up from server/src/ to project root
+        
+        # Set default config file if none provided
+        if config_file is None:
+            config_file = project_root / "server" / "voices" / "voice_config.json"
+        else:
+            # Convert relative paths to absolute
+            config_file = project_root / config_file
+            
+            
         self.development_mode = development_mode
         self.voice_pool = self._load_voice_pool(config_file)
         self.character_assignments = {}  # character_name -> voice_id
@@ -136,7 +148,33 @@ class VoiceAssigner:
     
     def _load_voice_pool(self, config_file: str) -> List[VoiceProfile]:
         with open(config_file, "r") as f:
-            return [VoiceProfile(**voice) for voice in json.load(f)["voices"]]
+            config_data = json.load(f)
+            
+            # Choose the appropriate mode
+            mode_key = "development_mode" if self.development_mode else "production_mode"
+            
+            # Get voices from the selected mode
+            voices_data = config_data[mode_key]["voices"]
+            
+            # Convert to VoiceProfile objects
+            voice_profiles = []
+            for voice_data in voices_data:
+                # Handle the characteristics nested structure
+                characteristics_data = voice_data.pop("characteristics", {})
+                characteristics = VoiceCharacteristics(**characteristics_data)
+                
+                # Create VoiceProfile with the characteristics
+                voice_profile = VoiceProfile(
+                    voice_id=voice_data["voice_id"],
+                    name=voice_data["name"],
+                    characteristics=characteristics,
+                    is_available=False,
+                    assigned_to=voice_data["name"],
+                    role=voice_data["role"]
+                )
+                voice_profiles.append(voice_profile)
+                
+            return voice_profiles
     
     def _load_assignments(self) -> None:
         if os.path.exists(self.persistence_file):

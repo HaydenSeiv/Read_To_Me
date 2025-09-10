@@ -66,8 +66,10 @@ class AdaptiveSynthesizer:
         start_time = time.time()
         voice_id = self.voice_mapping.get(voice_type, "default")
         
-        # Generate filename using configurable path for audio output
-        self.audio_output_dir = Path("server/audio_output")
+        # Get project root relative to this file
+        current_file = os.path.abspath(__file__)
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_file)))
+        self.audio_output_dir = Path(project_root) / "server" / "audio_output"
         output_path = self.audio_output_dir / f"{voice_type}_{hash(text)}.wav"
         
         if self.development_mode:
