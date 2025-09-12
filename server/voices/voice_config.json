@@ -2,7 +2,7 @@
     "development_mode": {
       "voices": [
         {
-          "voice_id": "default",
+          "voice_id": "p225",
           "name": "Default Voice",
           "characteristics": {
             "gender": "neutral",
@@ -16,7 +16,7 @@
     "production_mode": {
       "voices": [
         {
-          "voice_id": "p225",
+          "voice_id": "p226",
           "name": "Narrator Voice",
           "characteristics": {
             "gender": "male",
@@ -26,7 +26,7 @@
           "role": "narrator"
         },
         {
-          "voice_id": "p226",
+          "voice_id": "p227",
           "name": "Female Character Voice",
           "characteristics": {
             "gender": "female",

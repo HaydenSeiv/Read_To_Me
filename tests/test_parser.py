@@ -4,14 +4,17 @@
 import sys
 import os
 sys.path.append('server')
-
-from src.parser import TextParser
+from server.src.parser import TextParser
+from pathlib import Path
 
 def test_parser():
     """Test the parser with sample text."""
     
+    project_root = Path(__file__).parent.parent
+    sample_file_path = project_root / 'server' / 'data' / 'sample_text.txt'
+    
     # Load sample text
-    with open('server/data/sample_text.txt', 'r', encoding='utf-8') as f:
+    with open(sample_file_path, 'r', encoding='utf-8') as f:
         sample_text = f.read()
     
     print('=== TESTING PARSER ON SAMPLE TEXT ===')

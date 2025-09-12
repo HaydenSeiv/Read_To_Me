@@ -12,9 +12,9 @@ from pathlib import Path
 from typing import Dict, Optional
 from .utils import setup_logging, get_logger, log_tts_operation
 import time
+import logging
 
-# You'll import this from utils.py once you create logging setup
-# from .utils import setup_logging
+
 
 class AdaptiveSynthesizer:
     """
@@ -27,16 +27,17 @@ class AdaptiveSynthesizer:
     """
     
     def __init__(self, development_mode: bool = True):
-        self.development_mode = development_mode
-        self.logger = get_logger(__name__)
+        self.development_mode = development_mode  
+        self.logger = get_logger(__name__)        
         self.logger.info(f"Initializing synthesizer in {'development' if development_mode else 'production'} mode")
         
-        
         if development_mode:
+            setup_logging(logging.DEBUG,True)
             # Fast model for development
             self.tts = TTS("tts_models/en/ljspeech/fast_pitch")
             self.voice_mapping = {"default": "default"}
         else:
+            setup_logging(logging.INFO,True)
             # High-quality model for production
             self.tts = TTS("tts_models/en/vctk/vits")
             self.voice_mapping = {
@@ -45,7 +46,6 @@ class AdaptiveSynthesizer:
                 "character_2": "p227",
                 # ... more character voices
             }
-        
         # Move to GPU if available
         if torch.cuda.is_available():
             self.tts.to("cuda")
@@ -64,7 +64,7 @@ class AdaptiveSynthesizer:
             str: Path to generated audio file
         """
         start_time = time.time()
-        voice_id = self.voice_mapping.get(voice_type, "default")
+        voice_id = voice_type
         
         # Get project root relative to this file
         current_file = os.path.abspath(__file__)
